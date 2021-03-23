@@ -4,27 +4,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
-var AppRouter_1 = require("./AppRouter");
-var knex_1 = require("knex");
-var db = knex_1.knex({
-    client: "pg",
-    connection: {
-        host: "127.0.0.1",
-        user: "postgres",
-        password: "",
-        database: "postgres",
-    },
-    // client: "pg",
-    // connection: {
-    //   connectionString: process.env.DATABASE_URL,
-    //   ssl: true,
-    // },
-});
+var cors_1 = __importDefault(require("cors"));
+var Login_1 = require("./controllers/Login");
+var Register_1 = require("./controllers/Register");
 var app = express_1.default();
+app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-app.use(AppRouter_1.AppRouter.getInstance());
-app.get("/", function (req, res) {
-    res.send("it is working!");
+app.use(cors_1.default());
+// controllers
+app.get("/", function (req, res) { return res.send("It's working!"); });
+app.post("/login", Login_1.loginAuthentication());
+app.post("/register", function (req, res) {
+    Register_1.handleRegister(req, res);
 });
 var PORT = process.env.PORT || 3000;
 app.listen(PORT, function () {

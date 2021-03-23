@@ -1,6 +1,22 @@
 version: "3.8"
 
 services:
+  # Backend API
+  foodmastr-api:
+    container_name: backend
+    image: node
+    build: ./
+    command: npm start
+    working_dir: /usr/src/foodmastr-api
+    environment:
+      POSTGRES_URI: postgres://root:root@postgres:5432/foodmastr
+      REDIS_URI: redis://redis:6379
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/src/foodmastr-api
+      - /usr/src/foodmastr-api/node_modules
+
   postgres:
     container_name: pg_db
     image: postgres
@@ -9,6 +25,7 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
       POSTGRES_DB: foodmastr
+      POSTGRES_HOST: postgres
     build: ./postgres
     ports:
       - "5432:5432"

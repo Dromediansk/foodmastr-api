@@ -8,7 +8,7 @@ CREATE TABLE users (
 	first_name VARCHAR(100) NOT NULL,
 	last_name VARCHAR(100) NOT NULL,
   country VARCHAR(100),
-  current_lang lang NOT NULL,
+  current_lang lang,
 	joined timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

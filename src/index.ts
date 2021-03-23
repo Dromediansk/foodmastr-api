@@ -1,29 +1,19 @@
 import express from "express";
-import { AppRouter } from "./AppRouter";
-import { Knex, knex } from "knex";
+import cors from "cors";
+import { loginAuthentication } from "./controllers/Login";
+import { handleRegister } from "./controllers/Register";
 
-const db: Knex.Config = knex({
-  client: "pg",
-  connection: {
-    host: "127.0.0.1",
-    user: "postgres",
-    password: "",
-    database: "postgres",
-  },
-  // client: "pg",
-  // connection: {
-  //   connectionString: process.env.DATABASE_URL,
-  //   ssl: true,
-  // },
-});
+const app: express.Application = express();
 
-const app = express();
-
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(AppRouter.getInstance());
+app.use(cors());
 
-app.get("/", (req, res) => {
-  res.send("it is working!");
+// controllers
+app.get("/", (req, res) => res.send("It's working!"));
+app.post("/login", loginAuthentication());
+app.post("/register", (req, res) => {
+  handleRegister(req, res);
 });
 
 const PORT = process.env.PORT || 3000;

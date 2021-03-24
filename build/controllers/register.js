@@ -43,7 +43,7 @@ exports.handleRegister = void 0;
 var dbConfig_1 = require("./../dbConfig");
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var handleRegister = function (req, res) {
-    var _a = req.body, email = _a.email, first_name = _a.first_name, last_name = _a.last_name, password = _a.password, current_lang = _a.current_lang;
+    var _a = req.body, email = _a.email, first_name = _a.first_name, last_name = _a.last_name, password = _a.password, current_lang = _a.current_lang, balance = _a.balance, currency = _a.currency;
     if (!email || !first_name || !last_name || !password) {
         return res.status(400).json("incorrect form submission");
     }
@@ -77,6 +77,8 @@ var handleRegister = function (req, res) {
                             first_name: first_name,
                             last_name: last_name,
                             current_lang: current_lang,
+                            balance: balance,
+                            currency: currency,
                             joined: new Date(),
                         })];
                 case 3:

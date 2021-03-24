@@ -2,20 +2,20 @@ version: "3.8"
 
 services:
   # Backend API
-  foodmastr-api:
+  xpense-api:
     container_name: backend
     image: node
     build: ./
     command: npm start
-    working_dir: /usr/src/foodmastr-api
+    working_dir: /usr/src/xpense-api
     environment:
-      POSTGRES_URI: postgres://root:root@postgres:5432/foodmastr
+      POSTGRES_URI: postgres://root:root@postgres:5432/xpense
       REDIS_URI: redis://redis:6379
     ports:
       - "3000:3000"
     volumes:
-      - ./:/usr/src/foodmastr-api
-      - /usr/src/foodmastr-api/node_modules
+      - ./:/usr/src/xpense-api
+      - /usr/src/xpense-api/node_modules
 
   postgres:
     container_name: pg_db
@@ -24,7 +24,7 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: foodmastr
+      POSTGRES_DB: xpense
       POSTGRES_HOST: postgres
     build: ./postgres
     ports:

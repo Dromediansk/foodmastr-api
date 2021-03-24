@@ -25,7 +25,7 @@ const handleLogin = (req: Request, res: Response) => {
           .select("*")
           .from("users")
           .where("email", "=", email)
-          .then((user: any[]) => user[0])
+          .then((user) => user[0])
           .catch(() => Promise.reject("unable to get user"));
       } else {
         Promise.reject("wrong credentials");
@@ -53,15 +53,20 @@ const setToken = (key: string, value: string) => {
   return Promise.resolve(redisClient.set(key, value));
 };
 
-const createSessions = (user: { id: string; email: string }) => {
+const createSessions = (user: {
+  id: string;
+  email: string;
+}): Promise<Session> => {
   //JWT token, return user data
   const { email, id } = user;
   const token = signToken(email);
   return setToken(token, id)
     .then(() => {
-      return { success: "true", userId: id, token };
+      return { success: true, userId: id, token };
     })
-    .catch(console.log);
+    .catch((err) => {
+      return err;
+    });
 };
 
 export const loginAuthentication = () => (req: Request, res: Response) => {
@@ -75,5 +80,5 @@ export const loginAuthentication = () => (req: Request, res: Response) => {
             : Promise.reject(data);
         })
         .then((session): Response<Session> => res.json(session))
-        .catch((err: any) => res.status(400).json(err));
+        .catch((err) => res.status(400).json(err));
 };

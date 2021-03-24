@@ -54,9 +54,11 @@ var createSessions = function (user) {
     var token = signToken(email);
     return setToken(token, id)
         .then(function () {
-        return { success: "true", userId: id, token: token };
+        return { success: true, userId: id, token: token };
     })
-        .catch(console.log);
+        .catch(function (err) {
+        return err;
+    });
 };
 var loginAuthentication = function () { return function (req, res) {
     var authorization = req.headers.authorization;

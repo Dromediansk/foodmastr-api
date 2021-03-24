@@ -1,15 +1,15 @@
 FROM node:15.12.0
 
 # Create app directory
-RUN mkdir -p /usr/src/foodmastr-api
-WORKDIR /usr/src/foodmastr-api
+RUN mkdir -p /usr/src/xpense-api
+WORKDIR /usr/src/xpense-api
 
 # Install app dependencies
-COPY package.json /usr/src/foodmastr-api
+COPY package.json /usr/src/xpense-api
 RUN npm install
 
 # Bundle app source
-COPY . /usr/src/foodmastr-api
+COPY . /usr/src/xpense-api
 
 # Build arguments
 ARG NODE_VERSION=15.12.0

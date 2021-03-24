@@ -4,7 +4,15 @@ import { Knex } from "knex";
 import { Request, Response } from "express";
 
 export const handleRegister = (req: Request, res: Response) => {
-  const { email, first_name, last_name, password, current_lang } = req.body;
+  const {
+    email,
+    first_name,
+    last_name,
+    password,
+    current_lang,
+    balance,
+    currency,
+  } = req.body;
   if (!email || !first_name || !last_name || !password) {
     return res.status(400).json("incorrect form submission");
   }
@@ -27,11 +35,13 @@ export const handleRegister = (req: Request, res: Response) => {
       if (emailInUse.length !== 0) {
         res.status(400).json("email address already in use!");
       }
-      const newUser: any = await trx("users").returning("*").insert({
+      const newUser: User[] = await trx("users").returning("*").insert({
         email: loginEmail[0],
         first_name,
         last_name,
         current_lang,
+        balance,
+        currency,
         joined: new Date(),
       });
       res.json(newUser[0]);

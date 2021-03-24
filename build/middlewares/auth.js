@@ -4,6 +4,8 @@ exports.requireAuth = void 0;
 var dbConfig_1 = require("../dbConfig");
 var requireAuth = function (req, res, next) {
     var authorization = req.headers.authorization;
+    // when testing in Postman, insert in headers:
+    // authorization: <token>
     if (!authorization) {
         return res.status(401).json("Unauthorized!");
     }

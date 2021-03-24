@@ -1,3 +1,4 @@
+import { User } from "./../models/User";
 import { db } from "./../dbConfig";
 import bcrypt from "bcrypt";
 import { Knex } from "knex";

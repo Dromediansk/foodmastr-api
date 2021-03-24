@@ -7,6 +7,8 @@ export const requireAuth = (
   next: NextFunction
 ) => {
   const { authorization } = req.headers;
+  // when testing in Postman, insert in headers:
+  // authorization: <token>
   if (!authorization) {
     return res.status(401).json("Unauthorized!");
   }

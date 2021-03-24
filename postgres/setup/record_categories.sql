@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-CREATE TABLE transaction_accounts (
+CREATE TABLE record_categories (
 	id serial PRIMARY KEY,
 	name text NOT NULL
 );

@@ -9,6 +9,12 @@ var redis_1 = __importDefault(require("redis"));
 // setup postgres
 exports.db = knex_1.knex({
     client: "pg",
+    // connection: {
+    //   host: "127.0.0.1",
+    //   user: "root",
+    //   password: "root",
+    //   database: "xpense",
+    // },
     connection: process.env.POSTGRES_URI,
 });
 //setup Redis

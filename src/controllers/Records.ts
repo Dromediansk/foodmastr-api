@@ -1,20 +1,30 @@
-import { Records } from "./../models/Records";
-import { db } from "../dbConfig";
+import { Knex } from "knex";
+import { db } from "./../dbConfig";
+import { Records, Record } from "./../models/Records";
 import { Request, Response } from "express";
 
 export const handleRecordsGet = async (
   req: Request,
   res: Response,
   type: Records
-) => {
+): Promise<Response> => {
   try {
     const { userId } = req.params;
+    const { dateFrom, dateTo } = req.body;
 
-    const records = await db
+    if (!dateFrom || !dateTo) {
+      return res.status(400).json("Please add correct date range!");
+    }
+    if (dateTo < dateFrom) {
+      return res.status(400).json("Incorrect date range!");
+    }
+
+    const records: Record[] = await db
       .select("*")
       .from("records")
       .where({ user_id: userId })
-      .where({ type });
+      .where({ type })
+      .whereBetween("created", [dateFrom, dateTo]);
 
     if (!records) {
       throw Error();
@@ -22,9 +32,40 @@ export const handleRecordsGet = async (
     if (records.length === 0) {
       return res.status(200).json("No records found!");
     } else {
-      res.json(records);
+      return res.json(records);
     }
-  } catch (err) {
+  } catch {
     return res.status(500).json("Unable to get records!");
   }
+};
+
+export const handleRecordAdd = async (
+  req: Request,
+  res: Response,
+  type: Records
+) => {
+  const { userId } = req.params;
+  const { amount, currency, categoryId, accountId, description } = req.body;
+
+  if (!categoryId || !accountId) {
+    return res.status(400).json("Missing category or account!");
+  }
+
+  db.transaction(async (trx: Knex.Transaction) => {
+    try {
+      const newRecord = await trx("records").returning("*").insert({
+        type,
+        user_id: userId,
+        amount,
+        currency,
+        category_id: categoryId,
+        account_id: accountId,
+        description,
+        created: new Date(),
+      });
+      res.json(newRecord[0]);
+    } catch {
+      return res.status(500).json("Unable to add record!");
+    }
+  });
 };

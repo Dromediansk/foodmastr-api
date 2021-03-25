@@ -14,42 +14,44 @@ export const handleRegister = (req: Request, res: Response) => {
     balance,
     currency,
   } = req.body;
+
   if (!email || !first_name || !last_name || !password) {
-    return res.status(400).json("incorrect form submission");
+    res.status(400).json("incorrect form submission");
   }
 
-  db.transaction(async (trx: Knex.Transaction) => {
-    try {
-      const saltRounds: number = 9;
-      const hash: string = bcrypt.hashSync(password, saltRounds);
-      const loginEmail: string[] = await trx
-        .insert({
-          hash: hash,
-          email: email,
-        })
-        .into("login")
-        .returning("email");
+  db.transaction(
+    async (trx: Knex.Transaction): Promise<void> => {
+      try {
+        const saltRounds: number = 9;
+        const hash: string = bcrypt.hashSync(password, saltRounds);
+        const loginEmail: string[] = await trx
+          .insert({
+            hash: hash,
+            email: email,
+          })
+          .into("login")
+          .returning("email");
 
-      const emailInUse: string[] = await trx.select("*").from("users").where({
-        email: loginEmail[0],
-      });
-      if (emailInUse.length !== 0) {
-        res.status(400).json("email address already in use!");
+        const emailInUse: string[] = await trx.select("*").from("users").where({
+          email: loginEmail[0],
+        });
+        if (emailInUse.length !== 0) {
+          res.status(400).json("email address already in use!");
+        }
+        const newUser: User[] = await trx("users").returning("*").insert({
+          email: loginEmail[0],
+          first_name,
+          last_name,
+          current_lang,
+          balance,
+          currency,
+          joined: new Date(),
+        });
+        res.json(newUser[0]);
+        trx.commit;
+      } catch {
+        res.status(400).json("unable to register");
       }
-      const newUser: User[] = await trx("users").returning("*").insert({
-        email: loginEmail[0],
-        first_name,
-        last_name,
-        current_lang,
-        balance,
-        currency,
-        joined: new Date(),
-      });
-      res.json(newUser[0]);
-      trx.commit;
-    } catch (err) {
-      console.log("err", err);
-      res.status(400).json("unable to register");
     }
-  });
+  );
 };

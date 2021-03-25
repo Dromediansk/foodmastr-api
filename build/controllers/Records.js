@@ -36,22 +36,30 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleRecordsGet = void 0;
-var dbConfig_1 = require("../dbConfig");
+exports.handleRecordAdd = exports.handleRecordsGet = void 0;
+var dbConfig_1 = require("./../dbConfig");
 var handleRecordsGet = function (req, res, type) { return __awaiter(void 0, void 0, void 0, function () {
-    var userId, records, err_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var userId, _a, dateFrom, dateTo, records, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
+                _c.trys.push([0, 2, , 3]);
                 userId = req.params.userId;
+                _a = req.body, dateFrom = _a.dateFrom, dateTo = _a.dateTo;
+                if (!dateFrom || !dateTo) {
+                    return [2 /*return*/, res.status(400).json("Please add correct date range!")];
+                }
+                if (dateTo < dateFrom) {
+                    return [2 /*return*/, res.status(400).json("Incorrect date range!")];
+                }
                 return [4 /*yield*/, dbConfig_1.db
                         .select("*")
                         .from("records")
                         .where({ user_id: userId })
-                        .where({ type: type })];
+                        .where({ type: type })
+                        .whereBetween("created", [dateFrom, dateTo])];
             case 1:
-                records = _a.sent();
+                records = _c.sent();
                 if (!records) {
                     throw Error();
                 }
@@ -59,14 +67,53 @@ var handleRecordsGet = function (req, res, type) { return __awaiter(void 0, void
                     return [2 /*return*/, res.status(200).json("No records found!")];
                 }
                 else {
-                    res.json(records);
+                    return [2 /*return*/, res.json(records)];
                 }
                 return [3 /*break*/, 3];
             case 2:
-                err_1 = _a.sent();
+                _b = _c.sent();
                 return [2 /*return*/, res.status(500).json("Unable to get records!")];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 exports.handleRecordsGet = handleRecordsGet;
+var handleRecordAdd = function (req, res, type) { return __awaiter(void 0, void 0, void 0, function () {
+    var userId, _a, amount, currency, categoryId, accountId, description;
+    return __generator(this, function (_b) {
+        userId = req.params.userId;
+        _a = req.body, amount = _a.amount, currency = _a.currency, categoryId = _a.categoryId, accountId = _a.accountId, description = _a.description;
+        if (!categoryId || !accountId) {
+            return [2 /*return*/, res.status(400).json("Missing category or account!")];
+        }
+        dbConfig_1.db.transaction(function (trx) { return __awaiter(void 0, void 0, void 0, function () {
+            var newRecord, _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, trx("records").returning("*").insert({
+                                type: type,
+                                user_id: userId,
+                                amount: amount,
+                                currency: currency,
+                                category_id: categoryId,
+                                account_id: accountId,
+                                description: description,
+                                created: new Date(),
+                            })];
+                    case 1:
+                        newRecord = _b.sent();
+                        res.json(newRecord[0]);
+                        return [3 /*break*/, 3];
+                    case 2:
+                        _a = _b.sent();
+                        return [2 /*return*/, res.status(500).json("Unable to add record!")];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        }); });
+        return [2 /*return*/];
+    });
+}); };
+exports.handleRecordAdd = handleRecordAdd;

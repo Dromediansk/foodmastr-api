@@ -6,7 +6,7 @@ import helmet from "helmet";
 import cors from "cors";
 import { loginAuthentication } from "./controllers/Login";
 import { handleRegister } from "./controllers/Register";
-import { handleRecordsGet } from "./controllers/Records";
+import { handleRecordAdd, handleRecordsGet } from "./controllers/Records";
 
 const app: express.Application = express();
 
@@ -25,11 +25,19 @@ app.post("/register", (req, res) => {
   handleRegister(req, res);
 });
 
+// records
 app.get("/expenses/:userId", requireAuth, (req, res) => {
   handleRecordsGet(req, res, Records.EXPENSE);
 });
 app.get("/incomes/:userId", requireAuth, (req, res) => {
   handleRecordsGet(req, res, Records.INCOME);
+});
+
+app.post("/expenses/:userId", requireAuth, (req, res) => {
+  handleRecordAdd(req, res, Records.EXPENSE);
+});
+app.post("/incomes/:userId", requireAuth, (req, res) => {
+  handleRecordAdd(req, res, Records.INCOME);
 });
 
 const PORT = process.env.PORT || 3000;

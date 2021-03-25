@@ -1,11 +1,14 @@
+import { Currencies } from "./Currencies";
+import { Langs } from "./Langs";
+
 interface Metadata {
   id: number;
   email: string;
 }
 
 export interface User extends Metadata {
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   country: string;
   current_lang: Langs;
   balance: number;

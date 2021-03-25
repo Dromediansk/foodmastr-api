@@ -25,11 +25,18 @@ app.post("/login", Login_1.loginAuthentication());
 app.post("/register", function (req, res) {
     Register_1.handleRegister(req, res);
 });
+// records
 app.get("/expenses/:userId", auth_1.requireAuth, function (req, res) {
     Records_2.handleRecordsGet(req, res, Records_1.Records.EXPENSE);
 });
 app.get("/incomes/:userId", auth_1.requireAuth, function (req, res) {
     Records_2.handleRecordsGet(req, res, Records_1.Records.INCOME);
+});
+app.post("/expenses/:userId", auth_1.requireAuth, function (req, res) {
+    Records_2.handleRecordAdd(req, res, Records_1.Records.EXPENSE);
+});
+app.post("/incomes/:userId", auth_1.requireAuth, function (req, res) {
+    Records_2.handleRecordAdd(req, res, Records_1.Records.INCOME);
 });
 var PORT = process.env.PORT || 3000;
 app.listen(PORT, function () {

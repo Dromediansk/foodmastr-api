@@ -45,14 +45,14 @@ var bcrypt_1 = __importDefault(require("bcrypt"));
 var handleRegister = function (req, res) {
     var _a = req.body, email = _a.email, first_name = _a.first_name, last_name = _a.last_name, password = _a.password, current_lang = _a.current_lang, balance = _a.balance, currency = _a.currency;
     if (!email || !first_name || !last_name || !password) {
-        return res.status(400).json("incorrect form submission");
+        res.status(400).json("incorrect form submission");
     }
     dbConfig_1.db.transaction(function (trx) { return __awaiter(void 0, void 0, void 0, function () {
-        var saltRounds, hash, loginEmail, emailInUse, newUser, err_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var saltRounds, hash, loginEmail, emailInUse, newUser, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
-                    _a.trys.push([0, 4, , 5]);
+                    _b.trys.push([0, 4, , 5]);
                     saltRounds = 9;
                     hash = bcrypt_1.default.hashSync(password, saltRounds);
                     return [4 /*yield*/, trx
@@ -63,12 +63,12 @@ var handleRegister = function (req, res) {
                             .into("login")
                             .returning("email")];
                 case 1:
-                    loginEmail = _a.sent();
+                    loginEmail = _b.sent();
                     return [4 /*yield*/, trx.select("*").from("users").where({
                             email: loginEmail[0],
                         })];
                 case 2:
-                    emailInUse = _a.sent();
+                    emailInUse = _b.sent();
                     if (emailInUse.length !== 0) {
                         res.status(400).json("email address already in use!");
                     }
@@ -82,13 +82,12 @@ var handleRegister = function (req, res) {
                             joined: new Date(),
                         })];
                 case 3:
-                    newUser = _a.sent();
+                    newUser = _b.sent();
                     res.json(newUser[0]);
                     trx.commit;
                     return [3 /*break*/, 5];
                 case 4:
-                    err_1 = _a.sent();
-                    console.log("err", err_1);
+                    _a = _b.sent();
                     res.status(400).json("unable to register");
                     return [3 /*break*/, 5];
                 case 5: return [2 /*return*/];

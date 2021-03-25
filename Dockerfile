@@ -4,8 +4,9 @@ FROM node:15.12.0
 RUN mkdir -p /usr/src/xpense-api
 WORKDIR /usr/src/xpense-api
 
-RUN mkdir -p /usr/src/xpense-api/build
-RUN touch -p /usr/src/xpense-api/build/index.js
+# Creating build folder with index
+RUN mkdir build
+RUN touch build/index.js
 
 # Install app dependencies
 COPY package.json /usr/src/xpense-api

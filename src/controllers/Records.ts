@@ -22,8 +22,7 @@ export const handleRecordsGet = async (
     const records: Record[] = await db
       .select("*")
       .from("records")
-      .where({ user_id: userId })
-      .where({ type })
+      .where({ user_id: userId, type })
       .whereBetween("created", [dateFrom, dateTo]);
 
     if (!records) {
@@ -39,11 +38,7 @@ export const handleRecordsGet = async (
   }
 };
 
-export const handleRecordAdd = async (
-  req: Request,
-  res: Response,
-  type: Records
-) => {
+export const handleRecordAdd = (req: Request, res: Response, type: Records) => {
   const { userId } = req.params;
   const { amount, currency, categoryId, accountId, description } = req.body;
 
@@ -51,21 +46,49 @@ export const handleRecordAdd = async (
     return res.status(400).json("Missing category or account!");
   }
 
-  db.transaction(async (trx: Knex.Transaction) => {
-    try {
-      const newRecord = await trx("records").returning("*").insert({
-        type,
-        user_id: userId,
-        amount,
-        currency,
-        category_id: categoryId,
-        account_id: accountId,
-        description,
-        created: new Date(),
-      });
-      res.json(newRecord[0]);
-    } catch {
-      return res.status(500).json("Unable to add record!");
+  db.transaction(
+    async (trx: Knex.Transaction): Promise<Response> => {
+      try {
+        const newRecord = await trx("records").returning("*").insert({
+          type,
+          user_id: userId,
+          amount,
+          currency,
+          category_id: categoryId,
+          account_id: accountId,
+          description,
+          created: new Date(),
+        });
+        return res.json(newRecord[0]);
+      } catch {
+        return res.status(500).json("Unable to add record!");
+      }
     }
-  });
+  );
+};
+
+export const handleRecordDelete = (
+  req: Request,
+  res: Response,
+  type: Records
+) => {
+  const { userId } = req.params;
+  const { recordId } = req.body;
+
+  if (!recordId) {
+    return res.status(400).json("Missing record!");
+  }
+
+  db.transaction(
+    async (trx: Knex.Transaction): Promise<Response> => {
+      try {
+        await trx("records")
+          .del()
+          .where({ user_id: userId, id: recordId, type });
+        return res.status(200).json("Record deleted successfully!");
+      } catch {
+        return res.status(500).json("Unable to delete record!");
+      }
+    }
+  );
 };

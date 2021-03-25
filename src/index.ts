@@ -6,7 +6,11 @@ import helmet from "helmet";
 import cors from "cors";
 import { loginAuthentication } from "./controllers/Login";
 import { handleRegister } from "./controllers/Register";
-import { handleRecordAdd, handleRecordsGet } from "./controllers/Records";
+import {
+  handleRecordAdd,
+  handleRecordDelete,
+  handleRecordsGet,
+} from "./controllers/Records";
 
 const app: express.Application = express();
 
@@ -38,6 +42,13 @@ app.post("/expenses/:userId", requireAuth, (req, res) => {
 });
 app.post("/incomes/:userId", requireAuth, (req, res) => {
   handleRecordAdd(req, res, Records.INCOME);
+});
+
+app.delete("/expenses/:userId", requireAuth, (req, res) => {
+  handleRecordDelete(req, res, Records.EXPENSE);
+});
+app.delete("/incomes/:userId", requireAuth, (req, res) => {
+  handleRecordDelete(req, res, Records.INCOME);
 });
 
 const PORT = process.env.PORT || 3000;

@@ -1,4 +1,4 @@
-import { createSession } from "./../utils/functions";
+import { createSession } from "../utils/auth-functions";
 import { User } from "./../models/User";
 import { db } from "./../dbConfig";
 import bcrypt from "bcrypt";
@@ -8,15 +8,15 @@ import { Request, Response } from "express";
 export const handleRegister = (req: Request, res: Response) => {
   const {
     email,
-    first_name,
-    last_name,
+    firstName,
+    lastName,
     password,
-    current_lang,
+    currentLang,
     balance,
     currency,
   } = req.body;
 
-  if (!email || !first_name || !last_name || !password) {
+  if (!email || !password) {
     return res.status(400).json("incorrect form submission");
   }
 
@@ -41,9 +41,9 @@ export const handleRegister = (req: Request, res: Response) => {
         }
         const newUser: User[] = await trx("users").returning("*").insert({
           email: loginEmail[0],
-          first_name,
-          last_name,
-          current_lang,
+          firstName,
+          lastName,
+          currentLang,
           balance,
           currency,
           joined: new Date(),

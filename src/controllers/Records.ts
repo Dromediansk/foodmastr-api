@@ -28,11 +28,7 @@ export const handleRecordsGet = async (
     if (!records) {
       throw Error();
     }
-    if (records.length === 0) {
-      return res.status(200).json("No records found!");
-    } else {
-      return res.json(records);
-    }
+    return res.json(records);
   } catch {
     return res.status(500).json("Unable to get records!");
   }
@@ -72,8 +68,8 @@ export const handleRecordDelete = (
   res: Response,
   type: Records
 ) => {
-  const { userId } = req.params;
-  const { recordId } = req.body;
+  const { recordId } = req.params;
+  const { userId } = req.body;
 
   if (!recordId) {
     return res.status(400).json("Missing record!");
@@ -82,11 +78,16 @@ export const handleRecordDelete = (
   db.transaction(
     async (trx: Knex.Transaction): Promise<Response> => {
       try {
-        await trx("records")
-          .del()
-          .where({ user_id: userId, id: recordId, type });
-        return res.status(200).json("Record deleted successfully!");
-      } catch {
+        const recordToDelete: Record[] = await trx("records")
+          .where({ user_id: userId, id: recordId, type })
+          .returning("*")
+          .del();
+        if (recordToDelete.length > 0 && recordToDelete[0].user_id === userId) {
+          return res.status(200).json("Record deleted successfully!");
+        } else {
+          return res.status(400).json("No record to delete found!");
+        }
+      } catch (err) {
         return res.status(500).json("Unable to delete record!");
       }
     }

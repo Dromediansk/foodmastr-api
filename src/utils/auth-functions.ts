@@ -1,5 +1,5 @@
-import { Session } from "./../models/User";
-import { redisClient } from "./../dbConfig";
+import { Session } from "../models/User";
+import { redisClient } from "../dbConfig";
 import jwt from "jsonwebtoken";
 
 const signToken = (email: string): string => {
@@ -7,15 +7,15 @@ const signToken = (email: string): string => {
   return jwt.sign(jwtPayload, "JWT_SECRET", { expiresIn: "2 days" });
 };
 
-const setToken = (key: string, id: number): Promise<boolean> => {
-  return Promise.resolve(redisClient.set(key, id.toString()));
+const setToken = (key: string, id: string): Promise<boolean> => {
+  return Promise.resolve(redisClient.set(key, id));
 };
 
-export const deleteToken = async (
+export const deleteSession = async (
   authorization: string,
-  userId: number
+  userId: string
 ): Promise<boolean> => {
-  return Promise.resolve(redisClient.del(authorization, userId.toString()));
+  return Promise.resolve(redisClient.del(authorization, userId));
 };
 
 export const createSession = async (user: {
@@ -26,7 +26,7 @@ export const createSession = async (user: {
     //JWT token, return user data
     const { email, id } = user;
     const token = signToken(email);
-    await setToken(token, id);
+    await setToken(token, id.toString());
 
     return { success: true, userId: id, token };
   } catch (err) {

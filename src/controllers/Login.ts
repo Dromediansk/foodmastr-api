@@ -1,4 +1,4 @@
-import { createSession } from "./../utils/functions";
+import { createSession } from "../utils/auth-functions";
 import { Session } from "./../models/User";
 import { db, redisClient } from "./../dbConfig";
 import { Request, Response } from "express";

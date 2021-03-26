@@ -1,5 +1,5 @@
 import { Response, Request } from "express";
-import { deleteToken } from "../utils/functions";
+import { deleteSession } from "../utils/auth-functions";
 
 export const handleLogout = async (
   req: Request,
@@ -10,7 +10,7 @@ export const handleLogout = async (
     const { authorization } = req.headers;
 
     if (authorization) {
-      await deleteToken(authorization, userId);
+      await deleteSession(authorization, userId);
       return res.status(200).json("User logged out successfully!");
     } else {
       throw Error();

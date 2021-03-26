@@ -48,10 +48,10 @@ app.post("/incomes/:userId", requireAuth, (req, res) => {
   handleRecordAdd(req, res, Records.INCOME);
 });
 
-app.delete("/expenses/:userId", requireAuth, (req, res) => {
+app.delete("/expenses/:recordId", requireAuth, (req, res) => {
   handleRecordDelete(req, res, Records.EXPENSE);
 });
-app.delete("/incomes/:userId", requireAuth, (req, res) => {
+app.delete("/incomes/:recordId", requireAuth, (req, res) => {
   handleRecordDelete(req, res, Records.INCOME);
 });
 

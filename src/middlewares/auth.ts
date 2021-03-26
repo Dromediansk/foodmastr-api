@@ -6,14 +6,14 @@ export const requireAuth = (
   res: Response,
   next: NextFunction
 ) => {
-  const { authorization } = req.headers;
+  const { authorization, userid } = req.headers; // token + user id
   // when testing in Postman, insert in headers:
   // authorization: <token>
-  if (!authorization) {
+  if (!authorization || !userid) {
     return res.status(401).json("Unauthorized!");
   }
   return redisClient.get(authorization, (err, reply) => {
-    if (err || !reply) {
+    if (err || !reply || reply !== userid) {
       return res.status(401).json("Unauthorized!");
     }
     return next();

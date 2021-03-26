@@ -15,3 +15,9 @@ export interface User extends Metadata {
   currency: Currencies;
   joined: Date;
 }
+
+export interface Session {
+  userId: number;
+  success: boolean;
+  token: string;
+}

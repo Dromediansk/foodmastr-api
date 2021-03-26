@@ -1,13 +1,8 @@
+import { createSession } from "./../utils/functions";
+import { Session } from "./../models/User";
 import { db, redisClient } from "./../dbConfig";
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-
-interface Session {
-  userId: number;
-  success: boolean;
-  token: string;
-}
 
 const handleLogin = async (req: Request) => {
   const { email, password } = req.body;
@@ -45,39 +40,14 @@ const getAuthTokenId = (req: any, res: Response): boolean => {
     if (err || !reply) {
       return res.status(400).json("Unauthorized");
     }
-    return res.json({ id: reply });
+    return res.status(200).json({ id: reply });
   });
-};
-
-const signToken = (email: string): string => {
-  const jwtPayload = { email };
-  return jwt.sign(jwtPayload, "JWT_SECRET", { expiresIn: "2 days" });
-};
-
-const setToken = (key: string, id: number): Promise<boolean> => {
-  return Promise.resolve(redisClient.set(key, id.toString()));
-};
-
-const createSession = async (user: {
-  id: number;
-  email: string;
-}): Promise<Session> => {
-  try {
-    //JWT token, return user data
-    const { email, id } = user;
-    const token = signToken(email);
-
-    await setToken(token, id);
-    return { success: true, userId: id, token };
-  } catch (err) {
-    return err;
-  }
 };
 
 export const loginAuthentication = () => async (
   req: Request,
   res: Response
-) => {
+): Promise<Response> => {
   try {
     const { authorization } = req.headers;
 
@@ -86,10 +56,10 @@ export const loginAuthentication = () => async (
       : await handleLogin(req);
 
     if (userToLogin.id && userToLogin.email) {
-      const session = await createSession(userToLogin);
+      const session: Session = await createSession(userToLogin);
       return res.json(session);
     } else {
-      Promise.reject(userToLogin);
+      return Promise.resolve(userToLogin);
     }
   } catch (err) {
     return res.status(400).json(err);

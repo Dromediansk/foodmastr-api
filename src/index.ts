@@ -1,3 +1,4 @@
+import { handleLogout } from "./controllers/Logout";
 import { Records } from "./models/Records";
 import { requireAuth } from "./middlewares/auth";
 import { AppRouter } from "./AppRouter";
@@ -27,6 +28,9 @@ app.get("/", (req, res) => res.send("It's working!"));
 app.post("/login", loginAuthentication());
 app.post("/register", (req, res) => {
   handleRegister(req, res);
+});
+app.post("/logout", requireAuth, (req, res) => {
+  handleLogout(req, res);
 });
 
 // records

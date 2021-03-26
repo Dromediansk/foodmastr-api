@@ -1,3 +1,4 @@
+import { createSession } from "./../utils/functions";
 import { User } from "./../models/User";
 import { db } from "./../dbConfig";
 import bcrypt from "bcrypt";
@@ -16,11 +17,11 @@ export const handleRegister = (req: Request, res: Response) => {
   } = req.body;
 
   if (!email || !first_name || !last_name || !password) {
-    res.status(400).json("incorrect form submission");
+    return res.status(400).json("incorrect form submission");
   }
 
   db.transaction(
-    async (trx: Knex.Transaction): Promise<void> => {
+    async (trx: Knex.Transaction): Promise<Response> => {
       try {
         const saltRounds: number = 9;
         const hash: string = bcrypt.hashSync(password, saltRounds);
@@ -36,7 +37,7 @@ export const handleRegister = (req: Request, res: Response) => {
           email: loginEmail[0],
         });
         if (emailInUse.length !== 0) {
-          res.status(400).json("email address already in use!");
+          return res.status(400).json("email address already in use!");
         }
         const newUser: User[] = await trx("users").returning("*").insert({
           email: loginEmail[0],
@@ -47,10 +48,13 @@ export const handleRegister = (req: Request, res: Response) => {
           currency,
           joined: new Date(),
         });
-        res.json(newUser[0]);
-        trx.commit;
+        const session = await createSession({
+          id: newUser[0].id,
+          email: newUser[0].email,
+        });
+        return res.json(session);
       } catch {
-        res.status(400).json("unable to register");
+        return res.status(400).json("unable to register");
       }
     }
   );

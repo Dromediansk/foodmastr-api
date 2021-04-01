@@ -4,20 +4,13 @@ import { db } from "./../dbConfig";
 import bcrypt from "bcrypt";
 import { Knex } from "knex";
 import { Request, Response } from "express";
+import { AUTH, GENERAL } from "../utils/ErrorCodes";
 
 export const handleRegister = (req: Request, res: Response) => {
-  const {
-    email,
-    firstName,
-    lastName,
-    password,
-    currentLang,
-    balance,
-    currency,
-  } = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json("incorrect form submission");
+    return res.status(400).json(AUTH.INVALID_CREDENTIALS);
   }
 
   db.transaction(
@@ -37,15 +30,10 @@ export const handleRegister = (req: Request, res: Response) => {
           email: loginEmail[0],
         });
         if (emailInUse.length !== 0) {
-          return res.status(400).json("email address already in use!");
+          return res.status(400).json({ message: AUTH.EMAIL_TAKEN });
         }
         const newUser: User[] = await trx("users").returning("*").insert({
           email: loginEmail[0],
-          firstName,
-          lastName,
-          currentLang,
-          balance,
-          currency,
           joined: new Date(),
         });
         const session = await createSession({
@@ -54,7 +42,7 @@ export const handleRegister = (req: Request, res: Response) => {
         });
         return res.json(session);
       } catch {
-        return res.status(400).json("unable to register");
+        return res.status(500).json(GENERAL.INTERNAL_SERVER_ERROR);
       }
     }
   );

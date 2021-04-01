@@ -7,6 +7,7 @@ export const handleLogout = async (
 ): Promise<Response> => {
   try {
     const { userId } = req.body;
+    console.log(req, "req");
     const { authorization } = req.headers;
 
     if (authorization) {

@@ -65,7 +65,7 @@ export const loginAuthentication = () => async (
     } else {
       return Promise.resolve(userToLogin);
     }
-  } catch {
-    return res.status(400).json({ code: AUTH.INVALID_CREDENTIALS });
+  } catch (err) {
+    return res.status(400).json(err);
   }
 };

@@ -10,12 +10,14 @@ export const handleRecordsGet = async (
 ): Promise<Response> => {
   try {
     const { userId } = req.params;
-    const { dateFrom, dateTo } = req.body;
+    const { datefrom, dateto } = req.headers;
 
-    if (!dateFrom || !dateTo) {
+    if (!datefrom || !dateto) {
+      console.log("hello 1");
       return res.status(400).json("Please add correct date range!");
     }
-    if (dateTo < dateFrom) {
+    if (dateto <= datefrom) {
+      console.log("hello 2");
       return res.status(400).json("Incorrect date range!");
     }
 
@@ -23,13 +25,14 @@ export const handleRecordsGet = async (
       .select("*")
       .from("records")
       .where({ user_id: userId, type })
-      .whereBetween("created", [dateFrom, dateTo]);
+      .whereBetween("created", [datefrom, dateto]);
 
     if (!records) {
       throw Error();
     }
     return res.json(records);
-  } catch {
+  } catch (err) {
+    console.log("err", err);
     return res.status(500).json("Unable to get records!");
   }
 };

@@ -10,8 +10,9 @@ import { handleRegister } from "./controllers/Register";
 import {
   handleRecordAdd,
   handleRecordDelete,
-  handleRecordsGet,
+  handleAllRecordsGet,
 } from "./controllers/Records";
+import { handleAllCategoriesGet } from "./controllers/Categories";
 
 const app: express.Application = express();
 
@@ -34,11 +35,8 @@ app.post("/logout", requireAuth, (req, res) => {
 });
 
 // records
-app.get("/expenses/:userId", requireAuth, (req, res) => {
-  handleRecordsGet(req, res, Records.EXPENSE);
-});
-app.get("/incomes/:userId", requireAuth, (req, res) => {
-  handleRecordsGet(req, res, Records.INCOME);
+app.get("/records/:userId", requireAuth, (req, res) => {
+  handleAllRecordsGet(req, res);
 });
 
 app.post("/expenses/:userId", requireAuth, (req, res) => {
@@ -53,6 +51,11 @@ app.delete("/expenses/:recordId", requireAuth, (req, res) => {
 });
 app.delete("/incomes/:recordId", requireAuth, (req, res) => {
   handleRecordDelete(req, res, Records.INCOME);
+});
+
+// Categories
+app.get("/categories/:userId", requireAuth, (req, res) => {
+  handleAllCategoriesGet(req, res);
 });
 
 const PORT = process.env.PORT || 3000;

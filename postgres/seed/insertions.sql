@@ -4,9 +4,9 @@ INSERT INTO users (email, first_name, last_name, balance, currency, current_lang
 
 INSERT INTO login (hash, email) VALUES ('$2b$09$BlOWc1K3i3CMLX4lVO3dluRd8nA8ObDOv1awT2TWxcbky1AZ0nfNG', 'sally@user.com');
 
-INSERT INTO record_accounts (name) VALUES ('Bank account');
+INSERT INTO record_accounts (user_id, name) VALUES (1, 'Bank account');
 
-INSERT INTO record_categories (name) VALUES ('Grocery');
+INSERT INTO record_categories (user_id, name) VALUES (1, 'Grocery');
 
 INSERT INTO records (type, user_id, amount, currency, account_id, category_id, description) VALUES ('EXPENSE', 1, 20, 'EUR', 1, 1, 'Some stuff');
 

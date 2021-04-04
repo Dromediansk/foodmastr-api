@@ -3,10 +3,9 @@ import { db } from "./../dbConfig";
 import { Records, Record } from "./../models/Records";
 import { Request, Response } from "express";
 
-export const handleRecordsGet = async (
+export const handleAllRecordsGet = async (
   req: Request,
-  res: Response,
-  type: Records
+  res: Response
 ): Promise<Response> => {
   try {
     const { userId } = req.params;
@@ -24,12 +23,9 @@ export const handleRecordsGet = async (
     const records: Record[] = await db
       .select("*")
       .from("records")
-      .where({ user_id: userId, type })
+      .where({ user_id: userId })
       .whereBetween("created", [datefrom, dateto]);
 
-    if (!records) {
-      throw Error();
-    }
     return res.json(records);
   } catch (err) {
     console.log("err", err);
@@ -39,7 +35,7 @@ export const handleRecordsGet = async (
 
 export const handleRecordAdd = (req: Request, res: Response, type: Records) => {
   const { userId } = req.params;
-  const { amount, currency, categoryId, accountId, description } = req.body;
+  const { amount, categoryId, accountId, description } = req.body;
 
   if (!categoryId || !accountId) {
     return res.status(400).json("Missing category or account!");
@@ -52,7 +48,6 @@ export const handleRecordAdd = (req: Request, res: Response, type: Records) => {
           type,
           user_id: userId,
           amount,
-          currency,
           category_id: categoryId,
           account_id: accountId,
           description,
